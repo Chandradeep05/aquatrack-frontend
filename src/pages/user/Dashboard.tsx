@@ -14,8 +14,18 @@ import {
   Moon,
   Target,
   Flame,
-  Calendar
+  Calendar,
+  ShieldCheck,
+  CheckCircle2,
+  Activity
 } from 'lucide-react';
+import {
+  RealisticCup,
+  RealisticGlass,
+  RealisticBottle,
+  RealisticFlask,
+  RealisticCylinder
+} from '../../components/common/RealisticObjects';
 
 export const Dashboard: React.FC = () => {
   const [summary, setSummary] = useState<TodaySummary | null>(null);
@@ -116,11 +126,38 @@ export const Dashboard: React.FC = () => {
   const totalGlassesGoal = Math.ceil(dailyGoal / 250);
 
   const containerPresets = [
-    { amount: 150, label: 'Cup', desc: '150ml', icon: '☕', color: 'from-amber-500/20 to-orange-500/10 border-amber-500/30 text-amber-300' },
-    { amount: 250, label: 'Glass', desc: '250ml', icon: '🥛', color: 'from-cyan-500/20 to-blue-500/10 border-cyan-500/30 text-cyan-300' },
-    { amount: 500, label: 'Bottle', desc: '500ml', icon: '🧴', color: 'from-emerald-500/20 to-teal-500/10 border-emerald-500/30 text-emerald-300' },
-    { amount: 750, label: 'Flask', desc: '750ml', icon: '🧊', color: 'from-indigo-500/20 to-purple-500/10 border-indigo-500/30 text-indigo-300' }
+    {
+      amount: 150,
+      label: 'Cup',
+      desc: '150 ml',
+      renderObject: (size = 38) => <RealisticCup size={size} />
+    },
+    {
+      amount: 250,
+      label: 'Glass',
+      desc: '250 ml',
+      renderObject: (size = 38) => <RealisticGlass size={size} />
+    },
+    {
+      amount: 500,
+      label: 'Bottle',
+      desc: '500 ml',
+      renderObject: (size = 38) => <RealisticBottle size={size} />
+    },
+    {
+      amount: 750,
+      label: 'Flask',
+      desc: '750 ml',
+      renderObject: (size = 38) => <RealisticFlask size={size} />
+    }
   ];
+
+  const getEntryObject = (amount: number) => {
+    if (amount <= 175) return <RealisticCup size={22} />;
+    if (amount <= 350) return <RealisticGlass size={22} />;
+    if (amount <= 600) return <RealisticBottle size={22} />;
+    return <RealisticFlask size={22} />;
+  };
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
@@ -232,7 +269,7 @@ export const Dashboard: React.FC = () => {
 
                 <div className="bg-slate-800/50 border border-slate-700/60 p-4 rounded-2xl flex flex-col items-center text-center">
                   <div className="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center mb-1.5">
-                    <span className="text-sm">🥛</span>
+                    <RealisticGlass size={20} />
                   </div>
                   <span className="text-lg font-black text-white">{glassesConsumed}/{totalGlassesGoal}</span>
                   <span className="text-[11px] font-semibold text-slate-400">Glasses</span>
@@ -242,82 +279,87 @@ export const Dashboard: React.FC = () => {
                   <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-1.5">
                     <Flame className="w-4 h-4" />
                   </div>
-                  <span className="text-lg font-black text-emerald-400">{isGoalMet ? 'Met 🏆' : 'Active'}</span>
+                  <span className="text-lg font-black text-emerald-400">{isGoalMet ? 'Goal Met' : 'Active'}</span>
                   <span className="text-[11px] font-semibold text-slate-400">Status</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Bottom Visualizer Row: Hydration Beaker & Food Tips */}
+          {/* Bottom Visualizer Row: Realistic Graduated Cylinder & Daily Cadence */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Hydration Level Graphic (Image 1) */}
+            {/* Realistic Graduated Cylinder Graphic */}
             <div className="bg-slate-900/70 backdrop-blur-xl border border-slate-800 p-5 rounded-3xl flex flex-col justify-between">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
                     <Droplets className="w-3.5 h-3.5" />
                   </div>
-                  <h4 className="text-sm font-bold text-white">Hydration Cylinder</h4>
+                  <h4 className="text-sm font-bold text-white">Graduated Hydrometer</h4>
                 </div>
-                <span className="text-xs font-bold text-cyan-400">{percentage}%</span>
+                <span className="text-xs font-mono font-bold text-cyan-400">{percentage}%</span>
               </div>
 
-              {/* Water Cylinder Illustration */}
-              <div className="flex items-center justify-center py-2">
-                <div className="relative w-24 h-36 border-2 border-slate-700 rounded-b-2xl rounded-t-lg bg-slate-950/60 overflow-hidden flex flex-col justify-end p-0.5 shadow-inner">
-                  {/* Gauge measurement lines */}
-                  <div className="absolute inset-y-0 right-1 flex flex-col justify-between py-2 text-[9px] font-mono text-slate-600 pointer-events-none select-none">
-                    <span>100%</span>
-                    <span>75%</span>
-                    <span>50%</span>
-                    <span>25%</span>
-                  </div>
-
-                  {/* Water Fill with Wave Animation */}
-                  <div
-                    className="w-full bg-gradient-to-t from-blue-600 via-cyan-500 to-sky-400 rounded-b-xl transition-all duration-1000 relative overflow-hidden"
-                    style={{ height: `${Math.max(8, percentage)}%` }}
-                  >
-                    <div className="absolute inset-0 bg-white/20 animate-wave rounded-full scale-y-75" />
-                  </div>
-                </div>
+              {/* Realistic Borosilicate Glass Cylinder */}
+              <div className="flex items-center justify-center py-1">
+                <RealisticCylinder percentage={percentage} />
               </div>
 
               <p className="text-center text-[11px] font-medium text-slate-400 mt-2">
-                {isGoalMet ? 'Optimal fluid level reached!' : 'Drink water periodically throughout the day.'}
+                {isGoalMet ? 'Optimal fluid volume achieved!' : 'Maintain periodic hydration throughout the day.'}
               </p>
             </div>
 
-            {/* Hydration Facts & Food Cards (Image 2) */}
+            {/* Hydration Intake Schedule & Daily Cadence */}
             <div className="bg-slate-900/70 backdrop-blur-xl border border-slate-800 p-5 rounded-3xl flex flex-col justify-between space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
-                  <Sparkles className="w-3.5 h-3.5" />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
+                    <Activity className="w-3.5 h-3.5" />
+                  </div>
+                  <h4 className="text-sm font-bold text-white">Hydration Cadence</h4>
                 </div>
-                <h4 className="text-sm font-bold text-white">Hydration Tips</h4>
+                <span className="text-[11px] font-semibold text-slate-400">Daily Pace</span>
               </div>
 
-              <div className="grid grid-cols-3 gap-2">
-                <div className="bg-slate-800/60 border border-slate-700/60 p-2.5 rounded-xl text-center">
-                  <span className="text-xl">🍉</span>
-                  <span className="text-[11px] font-bold text-slate-200 block mt-1">Watermelon</span>
-                  <span className="text-[10px] text-cyan-400 font-semibold">92% Water</span>
+              <div className="space-y-2.5">
+                <div className="bg-slate-800/50 border border-slate-700/60 p-2.5 rounded-xl flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <RealisticGlass size={22} />
+                    <div>
+                      <span className="text-xs font-extrabold text-slate-200 block">Morning Kickstart</span>
+                      <span className="text-[10px] text-slate-400">Wake up — 12:00 PM</span>
+                    </div>
+                  </div>
+                  <span className="text-xs font-mono font-bold text-cyan-400">500 ml</span>
                 </div>
-                <div className="bg-slate-800/60 border border-slate-700/60 p-2.5 rounded-xl text-center">
-                  <span className="text-xl">🥒</span>
-                  <span className="text-[11px] font-bold text-slate-200 block mt-1">Cucumber</span>
-                  <span className="text-[10px] text-cyan-400 font-semibold">96% Water</span>
+
+                <div className="bg-slate-800/50 border border-slate-700/60 p-2.5 rounded-xl flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <RealisticBottle size={22} />
+                    <div>
+                      <span className="text-xs font-extrabold text-slate-200 block">Midday Replenish</span>
+                      <span className="text-[10px] text-slate-400">12:00 PM — 5:00 PM</span>
+                    </div>
+                  </div>
+                  <span className="text-xs font-mono font-bold text-emerald-400">1,000 ml</span>
                 </div>
-                <div className="bg-slate-800/60 border border-slate-700/60 p-2.5 rounded-xl text-center">
-                  <span className="text-xl">🍊</span>
-                  <span className="text-[11px] font-bold text-slate-200 block mt-1">Oranges</span>
-                  <span className="text-[10px] text-cyan-400 font-semibold">87% Water</span>
+
+                <div className="bg-slate-800/50 border border-slate-700/60 p-2.5 rounded-xl flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <RealisticCup size={22} />
+                    <div>
+                      <span className="text-xs font-extrabold text-slate-200 block">Evening Balance</span>
+                      <span className="text-[10px] text-slate-400">5:00 PM — Sleep</span>
+                    </div>
+                  </div>
+                  <span className="text-xs font-mono font-bold text-indigo-400">500 ml</span>
                 </div>
               </div>
 
-              <p className="text-[11px] text-slate-400 leading-relaxed border-t border-slate-800/80 pt-2.5">
-                💡 <strong className="text-slate-300">Pro tip:</strong> Consuming water-rich fruits helps sustain consistent cellular hydration between meals.
+              <p className="text-[11px] text-slate-400 leading-relaxed border-t border-slate-800/80 pt-2.5 flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span>Steady fluid distribution optimizes cellular hydration and focus.</span>
               </p>
             </div>
           </div>
@@ -341,14 +383,16 @@ export const Dashboard: React.FC = () => {
                     key={preset.amount}
                     type="button"
                     onClick={() => setSelectedAmount(preset.amount)}
-                    className={`p-3.5 rounded-2xl border transition-all flex flex-col items-center justify-center gap-1 group relative overflow-hidden ${
+                    className={`p-3.5 rounded-2xl border transition-all flex flex-col items-center justify-center gap-1.5 group relative overflow-hidden ${
                       isSelected
-                        ? 'bg-gradient-to-br from-cyan-500/30 via-blue-500/20 to-indigo-500/20 border-cyan-400 shadow-lg shadow-cyan-500/20'
+                        ? 'bg-gradient-to-br from-cyan-500/25 via-blue-500/15 to-indigo-500/15 border-cyan-400 shadow-lg shadow-cyan-500/20'
                         : 'bg-slate-800/40 hover:bg-slate-800/80 border-slate-700/60 hover:border-slate-600'
                     }`}
                   >
-                    <span className="text-2xl group-hover:scale-110 transition-transform">{preset.icon}</span>
-                    <span className="text-sm font-extrabold text-white mt-0.5">{preset.label}</span>
+                    <div className="group-hover:scale-105 transition-transform">
+                      {preset.renderObject(38)}
+                    </div>
+                    <span className="text-sm font-extrabold text-white">{preset.label}</span>
                     <span className="text-[11px] font-semibold text-cyan-400">{preset.desc}</span>
                   </button>
                 );
@@ -426,8 +470,8 @@ export const Dashboard: React.FC = () => {
                     className="p-3 rounded-2xl bg-slate-800/40 hover:bg-slate-800/80 border border-slate-800 transition-all flex items-center justify-between group"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center border border-cyan-500/20">
-                        <Droplets className="w-4 h-4" />
+                      <div className="w-9 h-9 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20 p-1">
+                        {getEntryObject(entry.amount)}
                       </div>
                       <div>
                         <span className="text-sm font-extrabold text-slate-100 block">

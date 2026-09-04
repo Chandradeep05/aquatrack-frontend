@@ -1,8 +1,28 @@
 # AquaTrack — Frontend Web Application
 
-Modern, responsive web application for **AquaTrack** — an intuitive daily water intake tracker designed for seamless hydration logging, progress visualization, historical tracking, and comprehensive administrative oversight.
+Modern, high-performance web application for **AquaTrack** — an intuitive daily water intake tracker engineered with an atmospheric dark glassmorphic UI, realistic physical vector components, real-time hydration telemetry, comprehensive historical analytics, and administrative oversight.
 
 Developed for the **Kravix Tech Fullstack Internship Assignment**.
+
+---
+
+## Visual Showcase & UI Highlights
+
+### 1. Hydration Dashboard & Realistic Container Presets
+![Hydration Dashboard](docs/screenshots/dashboard-hero.png)
+*Dark atmospheric dashboard featuring an animated circular progress ring, real-time hydration KPI cards, and custom realistic physical objects (Ceramic Cup, Crystal Glass Tumbler, Stainless Steel Sport Bottle, and Insulated Hydro Flask) with custom volume steppers.*
+
+### 2. Graduated Hydrometer & Daily Hydration Cadence
+![Hydrometer & Cadence](docs/screenshots/dashboard-hydrometer.png)
+*Laboratory-grade borosilicate graduated cylinder showing live fluid meniscus and wave animations, scientific daily hydration schedule (Morning, Midday, Evening targets), and timestamped drink activity log.*
+
+### 3. Superuser Admin Console
+![Admin Console](docs/screenshots/admin-console.png)
+*Centralized administration portal displaying system-wide aggregate KPIs (Users, Logs, Daily Total, Active Target), global daily goal configuration, and user table with cascade warning modals and log inspection.*
+
+### 4. Dark Glassmorphic Authentication
+![Authentication Screen](docs/screenshots/auth-login.png)
+*Secure authentication with ambient radial glow orbs, frosted glass borders, responsive validation states, and secure demo email autofill.*
 
 ---
 
@@ -11,49 +31,55 @@ Developed for the **Kravix Tech Fullstack Internship Assignment**.
 - [Key Features](#key-features)
 - [Tech Stack](#tech-stack)
 - [Application Architecture](#application-architecture)
+- [Automated Testing Suite](#automated-testing-suite)
+- [Continuous Integration (CI)](#continuous-integration-ci)
 - [Getting Started](#getting-started)
 - [Environment Configuration](#environment-configuration)
 - [Routes & Role-Based Guarding](#routes--role-based-guarding)
-- [Design Decisions & Fallbacks](#design-decisions--fallbacks)
-- [Verification & Build](#verification--build)
+- [Verification & Production Build](#verification--production-build)
 
 ---
 
 ## Overview
 
-AquaTrack frontend delivers a SaaS-grade, mobile-responsive user experience across two separate user roles:
+AquaTrack delivers a refined, mobile-responsive user experience across two distinct user roles:
+
 1. **User Experience**:
-   - Visual daily progress card displaying today's intake against the target goal (with guaranteed 2000 ml default fallback).
-   - Quick-add buttons for instant logging (+250ml cup, +500ml bottle, +750ml flask, +1000ml carafe) alongside custom volume input.
-   - Real-time entry timeline with timestamps and inline deletion.
-   - Comprehensive history view grouping past hydration by calendar date with achievement badges.
+   - **Circular SVG Progress Ring**: Visual daily percentage tracker with smooth SVG stroke animations.
+   - **Realistic Physical Objects**: Custom vector models for Cup (150 ml), Glass (250 ml), Bottle (500 ml), and Flask (750 ml) replacing cartoon stickers.
+   - **Graduated Hydrometer**: Volumetric borosilicate cylinder reflecting exact daily fluid intake.
+   - **Intake Schedule**: Daily pace targets (Morning Kickstart 500 ml, Midday Replenish 1,000 ml, Evening Balance 500 ml).
+   - **Drink Activity Log**: Timestamped logs with beverage-specific realistic icons and one-click removal.
+   - **Historical Tracking**: Grouped calendar view with UTC day consistency and goal badges.
+
 2. **Admin Experience**:
-   - System overview cards: Total Users, Total Intake Logs, Today's Total System Volume, and Current Active Goal.
-   - User management table with one-click user intake history inspection.
-   - Safe user deletion with confirmation modal and explicit cascade deletion warnings.
-   - Client-side safeguard locking out admin self-deletion.
-   - Global recommended daily goal configuration form with immediate feedback.
+   - **Real-Time Telemetry**: Total users, total intake logs, system-wide today intake volume, and active target.
+   - **User Table**: Comprehensive member listing with inspection modals.
+   - **Cascade User Deletion**: Safe deletion modal with cascade warnings and admin self-delete protection.
+   - **Global Goal Management**: Instant system-wide recommendation updates.
 
 ---
 
 ## Key Features
 
-- **Modern & Clean UI**: Built with Tailwind CSS, custom hydration palettes (brand blues, cyans, emeralds), smooth SVG progress rings, and Lucide icons.
-- **Route Guarding & State**: JWT-backed `AuthContext` with automatic session restoration via `GET /api/auth/me` and role-based `<ProtectedRoute />` redirects.
-- **Defensive Error Handling & Toasts**: Non-intrusive toast notifications for feedback on logs, updates, deletions, and error responses.
-- **Zero-Crash Goal Fallback**: Always falls back defensively to `2000 ml` if backend data or settings are uninitialized.
-- **Axios Interceptor Pipeline**: Transparently injects Bearer JWT on requests and automatically redirects on expired session `401` responses.
+- **Dark Glassmorphic UI**: High-fidelity dark aesthetic (`bg-slate-950`, ambient radial cyan/blue glows, backdrop blur, frosted borders).
+- **Zero-Sticker Design**: Realistic physical glassware and container vectors built using clean inline SVGs with accurate lighting and reflections.
+- **Defensive Error Handling**: Safe `localStorage` JSON parsing with fallback error recovery; non-intrusive toast notifications.
+- **Guaranteed Fallback**: Defensive default target of `2000 ml` if backend settings are uninitialized.
+- **Axios Interceptor Pipeline**: Automatic Bearer token injection and seamless handling of expired sessions.
 
 ---
 
 ## Tech Stack
 
 - **Framework**: React 18 + Vite
-- **Language**: TypeScript (strict mode)
+- **Language**: TypeScript (strict compiler configuration)
 - **Styling**: Tailwind CSS, PostCSS, Autoprefixer
 - **Icons**: Lucide React
 - **Routing**: React Router v6
-- **HTTP Client**: Axios with interceptors
+- **HTTP Client**: Axios with request/response interceptors
+- **Testing**: Vitest, React Testing Library, jsdom, @testing-library/jest-dom
+- **CI/CD**: GitHub Actions workflow (`.github/workflows/ci.yml`)
 
 ---
 
@@ -61,44 +87,95 @@ AquaTrack frontend delivers a SaaS-grade, mobile-responsive user experience acro
 
 ```
 aquatrack-frontend/
+├── .github/
+│   └── workflows/
+│       └── ci.yml             # Automated CI pipeline running across Node 18 & 20
+├── docs/
+│   └── screenshots/           # High-resolution UI showcase images
 ├── src/
+│   ├── __tests__/             # Automated Vitest component & integration test suites
+│   │   ├── setup.ts           # Test environment setup with jest-dom matchers
+│   │   ├── AuthContext.test.tsx    # Token restoration, corrupted storage handling
+│   │   ├── ProtectedRoute.test.tsx # Route guarding and admin RBAC restriction
+│   │   └── Dashboard.test.tsx      # Metrics rendering, preset selection, intake logging
 │   ├── api/
-│   │   ├── client.ts          # Configured Axios instance with JWT & 401 interceptors
+│   │   ├── client.ts          # Axios instance with auth headers & error interceptors
 │   │   ├── authApi.ts         # Register, Login, GetMe session restore
 │   │   ├── intakeApi.ts       # Log intake, Today summary, History, Delete entry
-│   │   ├── adminApi.ts        # All users with metrics, user inspection, user delete
-│   │   └── settingsApi.ts     # Daily goal get & update
+│   │   ├── adminApi.ts        # Admin metrics, user inspection, cascade delete
+│   │   └── settingsApi.ts     # Global daily goal get & update
 │   ├── components/
 │   │   ├── common/
-│   │   │   ├── ProtectedRoute.tsx # Role-aware route guard
-│   │   │   └── Modal.tsx          # Accessible modal dialog
+│   │   │   ├── ProtectedRoute.tsx  # Role-aware route guard
+│   │   │   ├── Modal.tsx           # Accessible modal dialog
+│   │   │   └── RealisticObjects.tsx # Realistic Cup, Glass, Bottle, Flask, Cylinder SVGs
 │   │   └── layout/
-│   │       ├── Navbar.tsx         # Responsive navbar with user profile & role badge
-│   │       └── Layout.tsx         # Outer app shell with footer
+│   │       ├── Navbar.tsx          # Glassmorphic navbar with role badge & navigation
+│   │       └── Layout.tsx          # Outer app shell with ambient background glow
 │   ├── context/
-│   │   ├── AuthContext.tsx        # Persistent user session, login, register, logout
-│   │   └── ToastContext.tsx       # Global toast notifications
+│   │   ├── AuthContext.tsx         # Persistent JWT session, login, register, logout
+│   │   └── ToastContext.tsx        # Toast alert system
 │   ├── pages/
 │   │   ├── auth/
-│   │   │   ├── Login.tsx          # Login view with demo credentials helper
-│   │   │   └── Register.tsx       # Registration form with validation
+│   │   │   ├── Login.tsx           # Glassmorphic login with demo email pre-fill
+│   │   │   └── Register.tsx        # Account registration with client-side validation
 │   │   ├── user/
-│   │   │   ├── Dashboard.tsx      # Today progress, quick add, entry list
-│   │   │   └── History.tsx        # Calendar-grouped history with stats
+│   │   │   ├── Dashboard.tsx       # Live progress, presets, hydrometer, cadence, log
+│   │   │   └── History.tsx         # Calendar-grouped history with stats
 │   │   └── admin/
-│   │       └── Dashboard.tsx      # Metrics, user table, goal config, delete modal
+│   │       └── Dashboard.tsx       # Metrics, user table, goal config, delete modal
 │   ├── types/
-│   │   └── index.ts               # Complete TypeScript data contracts
-│   ├── App.tsx                    # Route definitions
-│   ├── index.css                  # Tailwind styles
-│   └── main.tsx                   # React root entrypoint
-├── .env.example                   # Environment configuration template
-├── package.json                   # Dependencies, build, and verify scripts
-├── tailwind.config.js             # Tailwind configuration
-├── tsconfig.json                  # TypeScript compiler settings
-├── vite.config.ts                 # Vite bundler configuration
-└── README.md                      # Documentation
+│   │   └── index.ts                # TypeScript data models and API response types
+│   ├── App.tsx                     # Route hierarchy
+│   ├── index.css                   # Custom wave animations and Tailwind directives
+│   └── main.tsx                    # React root bootstrap
+├── .env.example                    # Environment template
+├── package.json                    # Scripts and dependencies
+├── tailwind.config.js              # Tailwind configuration
+├── tsconfig.json                   # TypeScript configuration
+└── vite.config.ts                  # Vite & Vitest configuration
 ```
+
+---
+
+## Automated Testing Suite
+
+The frontend includes a test suite covering authentication resilience, route authorization, and interactive hydration logging:
+
+- **AuthContext Tests**:
+  - Unauthenticated initialization on empty storage
+  - Session restoration from valid tokens via `getMeApi`
+  - Safe parsing of corrupted `localStorage` JSON without crashing
+  - Login state updates and logout cleanup
+- **ProtectedRoute Tests**:
+  - Redirects unauthenticated visitors to `/login`
+  - Permits authenticated users into protected views
+  - Blocks standard users from accessing `/admin`
+  - Grants access to users with `admin` role
+- **Dashboard Tests**:
+  - Renders today's summary metrics and realistic presets
+  - Container preset clicks update the selected volume
+  - Intake logging dispatches API call and updates summary
+  - API errors trigger user-friendly toast alerts
+
+Run tests:
+```bash
+npm test
+```
+
+Run full verification (linting, automated tests, and production build):
+```bash
+npm run verify
+```
+
+---
+
+## Continuous Integration (CI)
+
+A GitHub Actions workflow is configured in `.github/workflows/ci.yml`. On every push and pull request to `main`, the workflow executes:
+- Multi-version matrix test across **Node.js 18.x and 20.x**
+- Clean dependency installation via `npm ci`
+- Full verification command: `npm run verify` (`tsc --noEmit && npm run test && npm run build`)
 
 ---
 
@@ -107,7 +184,7 @@ aquatrack-frontend/
 ### Prerequisites
 - Node.js (v18 or higher)
 - npm (v9 or higher)
-- Running AquaTrack backend API (`http://localhost:5000`)
+- Running instance of `aquatrack-backend` (port 5000)
 
 ### Installation
 1. Clone the repository and navigate into the directory:
@@ -125,53 +202,35 @@ aquatrack-frontend/
    ```bash
    cp .env.example .env
    ```
-   Default `.env` points to:
-   ```env
-   VITE_API_BASE_URL=http://localhost:5000/api
-   ```
+   *Default: `VITE_API_URL=http://localhost:5000/api`*
 
-4. Start the development server:
+4. Launch development server:
    ```bash
    npm run dev
    ```
 
-Open your browser at `http://localhost:5173`.
+The application will be accessible at `http://localhost:5173`.
 
 ---
 
 ## Routes & Role-Based Guarding
 
-| Path | Access | Description |
-|---|:---:|---|
-| `/login` | Public | User & Administrator sign-in |
-| `/register` | Public | Account registration (always creates standard user) |
-| `/` | Authenticated (User) | User dashboard with today summary & quick add |
-| `/history` | Authenticated (User) | Chronological intake history grouped by date |
-| `/admin` | Admin Only | Admin console: metrics, user management, goal config |
+| Route | Protection | Allowed Roles | Description |
+|---|---|---|---|
+| `/login` | Public | All | Sign in with email and password |
+| `/register` | Public | All | Register a new user account |
+| `/` | Authenticated | `user`, `admin` | User dashboard with hydration tracking |
+| `/history` | Authenticated | `user`, `admin` | Calendar-grouped consumption history |
+| `/admin` | Admin Only | `admin` | Platform metrics, user table, goal configuration |
+| `*` | Catch-all | All | Redirects to `/` |
 
 ---
 
-## Design Decisions & Fallbacks
+## Verification & Production Build
 
-- **Defensive Goal Fallback**: If the API returns `null` or undefined for `dailyGoalMl`, the frontend falls back seamlessly to `2000 ml` without breaking or showing NaN percentages.
-- **Admin Self-Deletion Safeguard**: Admins cannot delete their own account. The button is disabled on their own row, and any attempt is trapped client-side before reaching the server's `400 Bad Request` guard.
-- **Single Active Goal Evaluation**: Historical records are evaluated against the currently configured system-wide daily goal.
-
----
-
-## Verification & Build
-
-Verify TypeScript compilation and production build:
+Execute the complete verification pipeline:
 ```bash
 npm run verify
 ```
 
-Build for production:
-```bash
-npm run build
-```
-
-Preview production build:
-```bash
-npm run preview
-```
+This compiles TypeScript, executes all Vitest suites, and bundles optimized static assets into `/dist`.

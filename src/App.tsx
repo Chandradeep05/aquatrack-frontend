@@ -23,7 +23,7 @@ export const App: React.FC = () => {
             <Route
               path="/"
               element={
-                <ProtectedRoute role="user">
+                <ProtectedRoute>
                   <Layout>
                     <UserDashboard />
                   </Layout>
@@ -33,7 +33,7 @@ export const App: React.FC = () => {
             <Route
               path="/history"
               element={
-                <ProtectedRoute role="user">
+                <ProtectedRoute>
                   <Layout>
                     <UserHistory />
                   </Layout>
